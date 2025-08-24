@@ -1,4 +1,4 @@
-minio-data
+minio-data/
 
 # Python
 __pycache__/
