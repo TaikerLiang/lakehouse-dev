@@ -1,0 +1,131 @@
+[tool.poetry]
+name = "lakehouse-data-scripts"
+version = "0.1.0"
+description = "Python scripts for data ingestion and management in the lakehouse"
+authors = ["TaikerLiang <liang0816tw@gmail.com>"]
+readme = "README.md"
+packages = [
+    {include = "utils"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+# Core dependencies
+pydantic = "^2.0.0"
+pydantic-settings = "^2.0.0"
+python-dotenv = "^1.0.0"
+
+# Data processing
+pandas = "^2.0.0"
+# polars = "^0.20.0"  # Optional, heavy dependency
+# pyarrow = "^14.0.0"  # Optional, requires cmake
+
+# Database clients
+trino = "^0.328.0"
+psycopg2-binary = "^2.9.0"
+redis = "^5.0.0"
+minio = "^7.2.0"
+
+# Utilities
+click = "^8.1.0"
+rich = "^13.7.0"
+loguru = "^0.7.0"
+
+[tool.poetry.group.dev.dependencies]
+# Testing
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+pytest-asyncio = "^0.23.0"
+
+# Code quality
+black = "^23.12.0"
+ruff = "^0.1.0"
+mypy = "^1.8.0"
+
+# Documentation (optional)
+# mkdocs = "^1.5.0"
+# mkdocs-material = "^9.5.0"
+
+[tool.poetry.scripts]
+# CLI commands for common tasks
+lakehouse-health = "utils.cli:health_check_command"
+lakehouse-ingest = "utils.cli:ingest_command"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# ============ TOOL CONFIGURATIONS ============
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "trino.*",
+    "minio.*",
+    "redis.*",
+    "psycopg2.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
