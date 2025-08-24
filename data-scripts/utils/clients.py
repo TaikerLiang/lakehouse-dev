@@ -80,6 +80,51 @@ class TrinoClient:
             logger.error(f"Query: {query}")
             raise
     
+    def execute(self, query: str) -> None:
+        """Execute query without returning results (for DDL/DML)"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(query)
+            logger.debug("Query executed successfully")
+        except Exception as e:
+            logger.error(f"Query execution failed: {e}")
+            logger.error(f"Query: {query}")
+            raise
+    
+    def fetchall(self, query: str) -> List[Dict[str, Any]]:
+        """Execute query and return results as list of dictionaries"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(query)
+            columns = [desc[0] for desc in cursor.description] if cursor.description else []
+            rows = cursor.fetchall()
+            results = [dict(zip(columns, row)) for row in rows]
+            logger.debug(f"Executed query successfully, returned {len(results)} rows")
+            return results
+        except Exception as e:
+            logger.error(f"Query execution failed: {e}")
+            logger.error(f"Query: {query}")
+            raise
+    
+    def fetchone(self, query: str) -> Optional[Dict[str, Any]]:
+        """Execute query and return first result as dictionary"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(query)
+            columns = [desc[0] for desc in cursor.description] if cursor.description else []
+            row = cursor.fetchone()
+            if row:
+                result = dict(zip(columns, row))
+                logger.debug("Query executed successfully, returned 1 row")
+                return result
+            else:
+                logger.debug("Query executed successfully, returned 0 rows")
+                return None
+        except Exception as e:
+            logger.error(f"Query execution failed: {e}")
+            logger.error(f"Query: {query}")
+            raise
+    
     def execute_with_description(self, query: str) -> Dict[str, Any]:
         """Execute query and return results with column descriptions"""
         try:
