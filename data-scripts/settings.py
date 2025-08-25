@@ -51,6 +51,12 @@ class Settings(BaseSettings):
     minio_bucket: str = Field(default='warehouse', env='MINIO_BUCKET')
     minio_secure: bool = Field(default=False, env='MINIO_SECURE')
     
+    # Infrastructure-specific MinIO settings
+    minio_root_user: str = Field(default='minio', env='MINIO_ROOT_USER')
+    minio_root_password: str = Field(default='minio123', env='MINIO_ROOT_PASSWORD')
+    minio_port: int = Field(default=9000, env='MINIO_PORT')
+    minio_console_port: int = Field(default=9001, env='MINIO_CONSOLE_PORT')
+    
     # ============ FEATURE FLAGS ============
     send_email_alerts: bool = Field(default=False, env='SEND_EMAIL_ALERTS')
     enable_data_validation: bool = Field(default=True, env='ENABLE_DATA_VALIDATION')
@@ -70,6 +76,17 @@ class Settings(BaseSettings):
     email_password: str = Field(default='', env='EMAIL_PASSWORD')
     email_from: str = Field(default='noreply@company.com', env='EMAIL_FROM')
     email_recipients: str = Field(default='', env='EMAIL_RECIPIENTS')  # comma-separated
+    
+    # ============ INFRASTRUCTURE SETTINGS ============
+    # CloudBeaver settings
+    cb_server_name: str = Field(default='Lakehouse CloudBeaver', env='CB_SERVER_NAME')
+    cb_server_url: str = Field(default='http://localhost:8978', env='CB_SERVER_URL')
+    cb_admin_name: str = Field(default='admin', env='CB_ADMIN_NAME')
+    cb_admin_password: str = Field(default='admin123', env='CB_ADMIN_PASSWORD')
+    cloudbeaver_port: int = Field(default=8978, env='CLOUDBEAVER_PORT')
+    
+    # Hive Metastore settings
+    hive_metastore_port: int = Field(default=9083, env='HIVE_METASTORE_PORT')
     
     class Config:
         env_file = str(ENV_FILE_PATH)
