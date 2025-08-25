@@ -3,12 +3,17 @@ Settings module - Single source of truth for ALL configuration
 Reads from .env file and provides typed settings for the entire application
 """
 import os
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from pydantic import Field
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Define root path of the project (parent of data-scripts directory)
+ROOT_PATH = Path(__file__).parent.parent
+ENV_FILE_PATH = ROOT_PATH / ".env"
+
+# Load environment variables from root .env file
+load_dotenv(dotenv_path=ENV_FILE_PATH)
 
 class Settings(BaseSettings):
     """All application settings in one place"""
@@ -67,7 +72,7 @@ class Settings(BaseSettings):
     email_recipients: str = Field(default='', env='EMAIL_RECIPIENTS')  # comma-separated
     
     class Config:
-        env_file = '.env'
+        env_file = str(ENV_FILE_PATH)
         case_sensitive = False
     
     # ============ HELPER METHODS ============

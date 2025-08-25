@@ -21,6 +21,36 @@ The stack follows the lakehouse pattern where:
 5. CloudBeaver offers web-based database administration and query interface
 6. Iceberg handles table format and ACID transactions
 
+## Environment Setup
+
+### Initial Configuration
+1. **Copy environment template:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Update environment variables:**
+   - Edit `.env` with your secrets and configuration
+   - Single file contains all infrastructure and application settings
+
+### Environment File Structure
+The project uses a **single `.env` file** approach for simplicity:
+
+- **Root `.env`**: Contains ALL environment variables
+  - Infrastructure secrets (PostgreSQL, MinIO, CloudBeaver credentials)
+  - Application settings (feature flags, processing settings)
+  - Port configurations and service endpoints
+  - Email/notification settings
+  - Both docker-compose and Python scripts read from this file
+
+### Security Best Practices
+- **Never commit `.env` files** - they contain secrets and credentials
+- **Use strong passwords** - replace default passwords in production
+- **Rotate credentials regularly** - especially for production environments
+- **Use different credentials** for different environments (dev/staging/prod)
+- **Review `.env.example` file** - it should never contain real secrets
+- **Single source of truth** - all services read from the same .env file, eliminating sync issues
+
 ## Common Commands
 
 ### Starting the Environment
@@ -39,11 +69,11 @@ docker-compose logs -f [service-name]
 ```
 
 ### Accessing Services
-- MinIO Console: http://localhost:9001 (minio/minio123)
+- MinIO Console: http://localhost:9001 (credentials in `.env`)
 - Trino Web UI: http://localhost:8080
-- CloudBeaver: http://localhost:8978 (admin/admin123)
+- CloudBeaver: http://localhost:8978 (credentials in `.env`)
 - MinIO API: http://localhost:9000
-- PostgreSQL: localhost:5433 (hive/hive)
+- PostgreSQL: localhost:5433 (credentials in `.env`)
 
 ### MinIO Client Operations
 The MinIO client is automatically configured via the init script. The warehouse bucket is created automatically on startup.
@@ -74,7 +104,7 @@ CloudBeaver provides a web-based interface for database administration and reduc
 
 ### Initial Setup
 1. Access CloudBeaver at http://localhost:8978
-2. Login with admin/admin123
+2. Login with credentials from `.env` file
 3. Configure data source connections:
    - **Trino**: `jdbc:trino://trino:8080/iceberg` (for Iceberg tables)
    - **PostgreSQL**: `jdbc:postgresql://postgres:5432/metastore` (for metadata)

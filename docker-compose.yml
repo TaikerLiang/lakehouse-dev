@@ -4,11 +4,11 @@ services:
     image: postgres:13
     container_name: postgres
     environment:
-      POSTGRES_DB: metastore
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -17,11 +17,11 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - ./minio-data:/data
     healthcheck:
@@ -52,9 +52,9 @@ services:
       SERVICE_NAME: metastore
       DB_DRIVER: postgres
       SKIP_SCHEMA_INIT: "false"
-      SERVICE_OPTS: "-Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://postgres:5432/metastore -Djavax.jdo.option.ConnectionUserName=hive -Djavax.jdo.option.ConnectionPassword=hive"
+      SERVICE_OPTS: "-Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://postgres:5432/${POSTGRES_DB} -Djavax.jdo.option.ConnectionUserName=${POSTGRES_USER} -Djavax.jdo.option.ConnectionPassword=${POSTGRES_PASSWORD}"
     ports:
-      - "9083:9083"
+      - "${HIVE_METASTORE_PORT:-9083}:9083"
     volumes:
       - hive-warehouse:/opt/hive/warehouse
 
@@ -65,7 +65,7 @@ services:
       hive-metastore:
         condition: service_started
     ports:
-      - "8080:8080"
+      - "${TRINO_PORT:-8080}:8080"
     volumes:
       - ./trino/catalog:/etc/trino/catalog
 
@@ -78,12 +78,12 @@ services:
       postgres:
         condition: service_started
     environment:
-      CB_SERVER_NAME: "Lakehouse CloudBeaver"
-      CB_SERVER_URL: "http://localhost:8978"
-      CB_ADMIN_NAME: "admin"
-      CB_ADMIN_PASSWORD: "admin123"
+      CB_SERVER_NAME: "${CB_SERVER_NAME}"
+      CB_SERVER_URL: "${CB_SERVER_URL}"
+      CB_ADMIN_NAME: "${CB_ADMIN_NAME}"
+      CB_ADMIN_PASSWORD: "${CB_ADMIN_PASSWORD}"
     ports:
-      - "8978:8978"
+      - "${CLOUDBEAVER_PORT:-8978}:8978"
     volumes:
       - cloudbeaver-data:/opt/cloudbeaver/workspace
     restart: unless-stopped
